@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_cloud/services/auth.dart';
+import 'package:flutter_firebase_cloud/utils/apputils.dart';
 
 class Register extends StatefulWidget {
   Register({this.toogleScreen});
@@ -11,9 +12,12 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
+  final AppUtils _utils = AppUtils();
 
   final _formKey = GlobalKey<FormState>();
+
   String error = '';
+  String passError = '';
 
   String _email = "";
   String _password = "";
@@ -37,7 +41,7 @@ class _RegisterState extends State<Register> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
+          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -50,6 +54,11 @@ class _RegisterState extends State<Register> {
                     return val.isEmpty ? 'Enter an email' : null;
                   },
                   onChanged: (value) => _email = value,
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    border: OutlineInputBorder(),
+                    errorText: error.isNotEmpty ? error : null,
+                  ),
                 ),
                 SizedBox(
                   height: 20.0,
@@ -59,6 +68,11 @@ class _RegisterState extends State<Register> {
                       val.length < 6 ? 'Enter a password 6+ chars long' : null,
                   onChanged: (value) => _password = value,
                   obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    border: OutlineInputBorder(),
+                    errorText: passError.isNotEmpty ? passError : null,
+                  ),
                 ),
                 SizedBox(
                   height: 20.0,
@@ -66,12 +80,15 @@ class _RegisterState extends State<Register> {
                 RaisedButton(
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
-                      print(_password);
-                      dynamic result = await _auth.registerWithEmailAndPassword(
-                          _email, _password);
-                      if (result == null) {
+                      if (_utils.validateEmail(_email)) {
+                        print(_password);
+                        dynamic result = await _auth
+                            .registerWithEmailAndPassword(_email, _password);
+
+                        _firebaseErrorMessage(result.toString());
+                      } else {
                         setState(() {
-                          error = 'Please supply a valid email';
+                          error = "Enter a valid email";
                         });
                       }
                     }
@@ -89,5 +106,15 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
+  }
+
+  void _firebaseErrorMessage(String error) {
+    if (error == "ERROR_WRONG_PASSWORD") {
+      setState(() {
+        passError = "Your password is wrong.";
+      });
+    } else {
+      error = _utils.firebaseErrorMessages(error);
+    }
   }
 }

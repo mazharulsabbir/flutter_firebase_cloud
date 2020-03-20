@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_cloud/services/auth.dart';
+import 'package:flutter_firebase_cloud/utils/apputils.dart';
 
 class SignIn extends StatefulWidget {
   SignIn({this.toogleScreen});
@@ -11,10 +12,12 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
+  final AppUtils _utils = AppUtils();
 
   final _formKey = GlobalKey<FormState>();
 
   String error = '';
+  String passError = '';
 
   String _email = "";
   String _password = "";
@@ -38,7 +41,7 @@ class _SignInState extends State<SignIn> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
+          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -49,6 +52,11 @@ class _SignInState extends State<SignIn> {
                 TextFormField(
                   validator: (value) => value.isEmpty ? 'Enter an email' : null,
                   onChanged: (value) => _email = value,
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    border: OutlineInputBorder(),
+                    errorText: error.isNotEmpty ? error : null,
+                  ),
                 ),
                 SizedBox(
                   height: 20.0,
@@ -58,6 +66,11 @@ class _SignInState extends State<SignIn> {
                       value.length < 6 ? 'Password should be 6+ chars' : null,
                   onChanged: (value) => _password = value,
                   obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    errorText: passError.isNotEmpty ? passError : null,
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 SizedBox(
                   height: 20.0,
@@ -65,22 +78,24 @@ class _SignInState extends State<SignIn> {
                 RaisedButton(
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
-                      print(_password);
-                      dynamic result = await _auth.signInWithEmailAndPassword(
-                          _email, _password);
-                      if (result == null) {
+                      if (_utils.validateEmail(_email)) {
+                        print(_password);
+                        dynamic result = await _auth.signInWithEmailAndPassword(
+                            _email, _password);
+
+                        _firebaseErrorMessage(result.toString());
                         setState(() {
-                          error = 'User not found!';
+                          error = null;
+                          passError = null;
+                        });
+                      } else {
+                        setState(() {
+                          error = "Enter a valid email";
                         });
                       }
                     }
                   },
                   child: Text('Sign In'),
-                ),
-                SizedBox(height: 12.0),
-                Text(
-                  error,
-                  style: TextStyle(color: Colors.red, fontSize: 14.0),
                 ),
               ],
             ),
@@ -88,5 +103,15 @@ class _SignInState extends State<SignIn> {
         ),
       ),
     );
+  }
+
+  void _firebaseErrorMessage(String error) {
+    if (error == "ERROR_WRONG_PASSWORD") {
+      setState(() {
+        passError = "Your password is wrong.";
+      });
+    } else {
+      error = _utils.firebaseErrorMessages(error);
+    }
   }
 }
