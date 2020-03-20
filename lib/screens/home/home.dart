@@ -16,11 +16,12 @@ class _HomeState extends State<Home> {
         title: Text('Firebase Flutter'),
         actions: <Widget>[
           FlatButton.icon(
-              onPressed: () async{
-                await _auth.signOut();
-              },
-              icon: Icon(Icons.person_outline),
-              label: Text("LOGOUT"))
+            onPressed: () async {
+              await _auth.signOut();
+            },
+            icon: Icon(Icons.person_outline),
+            label: Text("LOGOUT"),
+          ),
         ],
       ),
     );

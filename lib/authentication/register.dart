@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_cloud/services/auth.dart';
 
-class SignIn extends StatefulWidget {
-  SignIn({this.toogleScreen});
+class Register extends StatefulWidget {
+
+  Register({this.toogleScreen});
   final Function toogleScreen;
 
   @override
-  _SignInState createState() => _SignInState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _SignInState extends State<SignIn> {
+class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
 
   String _email = "";
@@ -20,16 +21,16 @@ class _SignInState extends State<SignIn> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
-        title: Text("Sign in"),
+        title: Text("Sign up"),
         centerTitle: true,
         actions: <Widget>[
           FlatButton.icon(
-            onPressed: () {
+            onPressed: ()  {
               widget.toogleScreen();
               print('object');
             },
             icon: Icon(Icons.person_outline),
-            label: Text("Sign Up"),
+            label: Text("Sign In"),
           ),
         ],
       ),
@@ -59,7 +60,7 @@ class _SignInState extends State<SignIn> {
                   onPressed: () async {
                     print('$_email and $_password');
                   },
-                  child: Text('Sign In'),
+                  child: Text('Register'),
                 ),
               ],
             ),
