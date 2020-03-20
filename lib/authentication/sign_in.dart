@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_cloud/services/auth.dart';
 import 'package:flutter_firebase_cloud/utils/apputils.dart';
+import 'package:flutter_firebase_cloud/utils/constraints.dart';
 
 class SignIn extends StatefulWidget {
   SignIn({this.toogleScreen});
@@ -66,10 +67,9 @@ class _SignInState extends State<SignIn> {
                       value.length < 6 ? 'Password should be 6+ chars' : null,
                   onChanged: (value) => _password = value,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: inputDecoration.copyWith(
                     hintText: 'Password',
                     errorText: passError.isNotEmpty ? passError : null,
-                    border: OutlineInputBorder(),
                   ),
                 ),
                 SizedBox(
