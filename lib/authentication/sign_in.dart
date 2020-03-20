@@ -12,6 +12,10 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
 
+  final _formKey = GlobalKey<FormState>();
+
+  String error = '';
+
   String _email = "";
   String _password = "";
 
@@ -26,7 +30,6 @@ class _SignInState extends State<SignIn> {
           FlatButton.icon(
             onPressed: () {
               widget.toogleScreen();
-              print('object');
             },
             icon: Icon(Icons.person_outline),
             label: Text("Sign Up"),
@@ -37,18 +40,22 @@ class _SignInState extends State<SignIn> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
           child: Form(
+            key: _formKey,
             child: Column(
               children: <Widget>[
                 SizedBox(
                   height: 20.0,
                 ),
                 TextFormField(
+                  validator: (value) => value.isEmpty ? 'Enter an email' : null,
                   onChanged: (value) => _email = value,
                 ),
                 SizedBox(
                   height: 20.0,
                 ),
                 TextFormField(
+                  validator: (value) =>
+                      value.length < 6 ? 'Password should be 6+ chars' : null,
                   onChanged: (value) => _password = value,
                   obscureText: true,
                 ),
@@ -57,9 +64,23 @@ class _SignInState extends State<SignIn> {
                 ),
                 RaisedButton(
                   onPressed: () async {
-                    print('$_email and $_password');
+                    if (_formKey.currentState.validate()) {
+                      print(_password);
+                      dynamic result = await _auth.signInWithEmailAndPassword(
+                          _email, _password);
+                      if (result == null) {
+                        setState(() {
+                          error = 'Please supply a valid email';
+                        });
+                      }
+                    }
                   },
                   child: Text('Sign In'),
+                ),
+                SizedBox(height: 12.0),
+                Text(
+                  error,
+                  style: TextStyle(color: Colors.red, fontSize: 14.0),
                 ),
               ],
             ),
