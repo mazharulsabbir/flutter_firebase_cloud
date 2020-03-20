@@ -70,7 +70,7 @@ class _SignInState extends State<SignIn> {
                           _email, _password);
                       if (result == null) {
                         setState(() {
-                          error = 'Please supply a valid email';
+                          error = 'User not found!';
                         });
                       }
                     }
